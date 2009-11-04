@@ -119,9 +119,9 @@ private
   type Spatial_Hash_t is record
     Dynamic_Entities : Cell_Map_t;
     Static_Entities  : Cell_Map_t;
-    Dynamic_Count    : Natural   := 0;
-    Static_Count     : Natural   := 0;
-    Cell_Size        : Real_Type := Real_Type'First;
+    Dynamic_Count    : Natural        := 0;
+    Static_Count     : Natural        := 0;
+    Cell_Size        : Real_Type'Base := Real_Type'Base'First;
   end record;
 
 end Spatial_Hash;
