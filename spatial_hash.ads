@@ -6,6 +6,11 @@ generic
 
   type Entity_ID_Type is range <>;
 
+  with package Entity_Sets is new Ada.Containers.Hashed_Sets
+    (Element_Type        => Entity_ID_Type,
+     Hash                => <>,
+     Equivalent_Elements => <>);
+
   with procedure Bounding_Box
     (Entity : in     Entity_ID_Type;
      Top    :    out Real_Type'Base;
@@ -31,7 +36,7 @@ package Spatial_Hash is
   -- Set of entities for a given cell.
   --
 
-  type Entity_Set_t is limited private;
+  subtype Entity_Set_t is Entity_Sets.Set;
 
   --
   -- Add a dynamic entity to the spatial hash.
@@ -93,28 +98,21 @@ private
   -- As IDs are already unique, these are just type conversions.
   --
 
-  function Entity_Hash (Entity_ID : Entity_ID_Type) return Ada.Containers.Hash_Type;
-
-  function Cell_ID_Hash (Cell_ID : Cell_ID_t) return Ada.Containers.Hash_Type;
+  function Cell_ID_Hash (Cell_ID : in Cell_ID_t)
+    return Ada.Containers.Hash_Type;
 
   --
   -- Set of entities per cell.
   --
 
-  package Entity_Sets is new Ada.Containers.Hashed_Sets
-    (Element_Type        => Entity_ID_Type,
-     Hash                => Entity_Hash,
-     Equivalent_Elements => "=");
-
-  type Entity_Set_t is new Entity_Sets.Set with null record;
-
   package Cell_Maps is new Ada.Containers.Hashed_Maps
     (Key_Type        => Cell_ID_t,
      Element_Type    => Entity_Set_t,
      Hash            => Cell_ID_Hash,
-     Equivalent_Keys => "=");
+     Equivalent_Keys => "=",
+     "="             => Entity_Sets."=");
 
-  type Cell_Map_t is new Cell_Maps.Map with null record;
+  subtype Cell_Map_t is Cell_Maps.Map;
 
   type Spatial_Hash_t is record
     Dynamic_Entities : Cell_Map_t;
