@@ -27,7 +27,14 @@ package Spatial_Hash is
   -- Abstract cell identifier.
   --
 
-  type Cell_ID_t is range 0 .. (2 ** 31 - 1);
+  type Cell_t is range 0 .. (2 ** 31 - 1);
+
+  --
+  -- Ordered set of cells for queries.
+  --
+
+  package Cell_Sets  is new Ada.Containers.Ordered_Sets (Cell_t);
+  subtype Cell_Set_t is Cell_Sets.Set;
 
   --
   -- Set of entities for a given cell.
@@ -95,7 +102,7 @@ package Spatial_Hash is
 
   procedure Entities_For_Cell
     (Spatial_Hash : in     Spatial_Hash_t;
-     Cell_ID      : in     Cell_ID_t;
+     Cell         : in     Cell_t;
      Entities     :    out Entity_Set_t);
 
   --
@@ -109,20 +116,20 @@ package Spatial_Hash is
 private
 
   --
-  -- As IDs are already unique, these are just type conversions.
+  -- As a cell ID is already unique and already likely the same
+  -- underlying type as Hash_Type, this is a no-op.
   --
 
-  function Cell_ID_Hash (Cell_ID : in Cell_ID_t)
-    return Ada.Containers.Hash_Type;
+  function Cell_Hash (Cell : in Cell_t) return Ada.Containers.Hash_Type;
 
   --
   -- Set of entities per cell.
   --
 
   package Cell_Maps is new Ada.Containers.Hashed_Maps
-    (Key_Type        => Cell_ID_t,
+    (Key_Type        => Cell_t,
      Element_Type    => Entity_Set_t,
-     Hash            => Cell_ID_Hash,
+     Hash            => Cell_Hash,
      Equivalent_Keys => "=",
      "="             => Entity_Sets."=");
 

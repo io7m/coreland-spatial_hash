@@ -91,14 +91,14 @@ package body Spatial_Hash is
   end Add_Static_Entity;
 
   --
-  -- Cell_ID_Hash
+  -- Cell_Hash
   --
 
-  function Cell_ID_Hash
-    (Cell_ID : Cell_ID_t) return Ada.Containers.Hash_Type is
+  function Cell_Hash
+    (Cell : Cell_t) return Ada.Containers.Hash_Type is
   begin
-    return Ada.Containers.Hash_Type (Cell_ID);
-  end Cell_ID_Hash;
+    return Ada.Containers.Hash_Type (Cell);
+  end Cell_Hash;
 
   --
   -- Clear
@@ -150,16 +150,16 @@ package body Spatial_Hash is
 
   procedure Entities_For_Cell
     (Spatial_Hash : in     Spatial_Hash_t;
-     Cell_ID      : in     Cell_ID_t;
+     Cell         : in     Cell_t;
      Entities     :    out Entity_Set_t)
   is
     Position : Cell_Maps.Cursor;
 
     procedure Query_Cell
-      (Cell_ID : in Cell_ID_t;
+      (Cell    : in Cell_t;
        In_Cell : in Entity_Set_t) is
     begin
-      pragma Assert (Cell_ID = Entities_For_Cell.Cell_ID);
+      pragma Assert (Cell = Entities_For_Cell.Cell);
 
       Entity_Sets.Union
         (Target => Entities,
@@ -170,14 +170,14 @@ package body Spatial_Hash is
 
     Position := Cell_Maps.Find
       (Container => Spatial_Hash.Dynamic_Entities,
-       Key       => Cell_ID);
+       Key       => Cell);
     if Position /= Cell_Maps.No_Element then
       Cell_Maps.Query_Element (Position, Query_Cell'Access);
     end if;
 
     Position := Cell_Maps.Find
       (Container => Spatial_Hash.Static_Entities,
-       Key       => Cell_ID);
+       Key       => Cell);
     if Position /= Cell_Maps.No_Element then
       Cell_Maps.Query_Element (Position, Query_Cell'Access);
     end if;
