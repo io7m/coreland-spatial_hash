@@ -36,6 +36,14 @@ package Spatial_Hash is
   subtype Entity_Set_t is Entity_Sets.Set;
 
   --
+  -- Return ordered set of active cells.
+  --
+
+  procedure Active_Cells
+    (Spatial_Hash : in     Spatial_Hash_t;
+     Cells        :    out Cell_Set_t);
+
+  --
   -- Add a dynamic entity to the spatial hash.
   --
 

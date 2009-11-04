@@ -19,6 +19,32 @@ package body Spatial_Hash is
      Entity_ID : in     Entity_ID_Type);
 
   --
+  -- Active_Cells
+  --
+
+  procedure Active_Cells
+    (Spatial_Hash : in     Spatial_Hash_t;
+     Cells        :    out Cell_Set_t)
+  is
+    procedure Process_Cursor (Position : in Cell_Maps.Cursor) is
+      procedure Process_Cell
+        (Cell_ID  : in Cell_t;
+         Entities : in Entity_Set_t) is
+      begin
+        if Entity_Sets.Length (Entities) > 1 then
+          Cell_Sets.Insert (Cells, Cell_ID);
+        end if;
+      end Process_Cell;
+    begin
+      Cell_Maps.Query_Element (Position, Process_Cell'Access);
+    end Process_Cursor;
+  begin
+    Cell_Sets.Clear (Cells);
+    Cell_Maps.Iterate (Spatial_Hash.Dynamic_Entities, Process_Cursor'Access);
+    Cell_Maps.Iterate (Spatial_Hash.Static_Entities, Process_Cursor'Access);
+  end Active_Cells;
+
+  --
   -- Add_Dynamic_Entity
   --
 
