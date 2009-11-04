@@ -3,17 +3,25 @@
 default: all
 
 all:\
-UNIT_TESTS/init UNIT_TESTS/init.ali UNIT_TESTS/init.o UNIT_TESTS/test.a \
-UNIT_TESTS/test.ali UNIT_TESTS/test.o spatial_hash.ali spatial_hash.o
+UNIT_TESTS/data.ali UNIT_TESTS/data.o UNIT_TESTS/init UNIT_TESTS/init.ali \
+UNIT_TESTS/init.o UNIT_TESTS/test.a UNIT_TESTS/test.ali UNIT_TESTS/test.o \
+spatial_hash.ali spatial_hash.o
+
+UNIT_TESTS/data.ads:\
+spatial_hash.ali
+
+UNIT_TESTS/data.o UNIT_TESTS/data.ali:\
+ada-compile UNIT_TESTS/data.adb UNIT_TESTS/data.ads
+	./ada-compile UNIT_TESTS/data.adb
 
 UNIT_TESTS/init:\
-ada-bind ada-link UNIT_TESTS/init.ald UNIT_TESTS/init.ali UNIT_TESTS/test.ali \
-spatial_hash.ali
+ada-bind ada-link UNIT_TESTS/init.ald UNIT_TESTS/init.ali UNIT_TESTS/data.ali \
+UNIT_TESTS/test.ali spatial_hash.ali
 	./ada-bind UNIT_TESTS/init.ali
 	./ada-link UNIT_TESTS/init UNIT_TESTS/init.ali
 
 UNIT_TESTS/init.o UNIT_TESTS/init.ali:\
-ada-compile UNIT_TESTS/init.adb spatial_hash.ali UNIT_TESTS/test.ali
+ada-compile UNIT_TESTS/init.adb UNIT_TESTS/data.ali UNIT_TESTS/test.ali
 	./ada-compile UNIT_TESTS/init.adb
 
 UNIT_TESTS/test.a:\
@@ -90,8 +98,9 @@ ada-compile spatial_hash.adb spatial_hash.ads
 clean-all: obj_clean ext_clean
 clean: obj_clean
 obj_clean:
-	rm -f UNIT_TESTS/init UNIT_TESTS/init.ali UNIT_TESTS/init.o UNIT_TESTS/test.a \
-	UNIT_TESTS/test.ali UNIT_TESTS/test.o spatial_hash.ali spatial_hash.o
+	rm -f UNIT_TESTS/data.ali UNIT_TESTS/data.o UNIT_TESTS/init UNIT_TESTS/init.ali \
+	UNIT_TESTS/init.o UNIT_TESTS/test.a UNIT_TESTS/test.ali UNIT_TESTS/test.o \
+	spatial_hash.ali spatial_hash.o
 ext_clean:
 	rm -f conf-adatype conf-cctype conf-ldtype conf-systype mk-ctxt
 
