@@ -1,0 +1,6 @@
+-g -fstack-check -gnatw.eeH.WT -gnatVa -gnato -gnata -gnatW8 -gnatiw -gnaty2aAbdefhiklnoprStu
+
+The first line of this file is passed to the Ada compiler as extra flags.
+
+This file is optional and may be deleted (remember to regenerate the Makefile
+after removal).

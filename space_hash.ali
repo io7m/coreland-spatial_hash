@@ -1,0 +1,14 @@
+V "GNAT Lib v4.4"
+A -gnatS
+P ZX
+R nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+U space_hash%s		space_hash.ads		73fc3779 NE OO PK GE
+
+D space_hash.ads	20091104124634 73fc3779
+D system.ads		20090706164902 846943df
+X 1 space_hash.ads
+2+8 Element_Type
+4k9*Space_Hash 2z8 8l5 8e15
+6I8*Cell_ID_t<long_integer>
+
