@@ -85,6 +85,15 @@ package Spatial_Hash is
     (Spatial_Hash : in Spatial_Hash_t) return Natural;
 
   --
+  -- Get entities for cell.
+  --
+
+  procedure Entities_For_Cell
+    (Spatial_Hash : in     Spatial_Hash_t;
+     Cell_ID      : in     Cell_ID_t;
+     Entities     :    out Entity_Set_t);
+
+  --
   -- Set cell size.
   --
 

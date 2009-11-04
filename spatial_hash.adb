@@ -1,6 +1,7 @@
 package body Spatial_Hash is
 
   use type Ada.Containers.Count_Type;
+  use type Cell_Maps.Cursor;
 
   --
   -- Private subprograms
@@ -80,7 +81,7 @@ package body Spatial_Hash is
   procedure Clear
     (Spatial_Hash : in out Spatial_Hash_t) is
   begin
-    Clear (Spatial_Hash.Dynamic_Entities);
+    Cell_Maps.Clear (Spatial_Hash.Dynamic_Entities);
     Spatial_Hash.Dynamic_Count := 0;
   end Clear;
 
@@ -92,7 +93,7 @@ package body Spatial_Hash is
     (Spatial_Hash : in out Spatial_Hash_t) is
   begin
     Clear (Spatial_Hash);
-    Clear (Spatial_Hash.Static_Entities);
+    Cell_Maps.Clear (Spatial_Hash.Static_Entities);
     Spatial_Hash.Static_Count := 0;
   end Clear_All;
 
@@ -113,19 +114,48 @@ package body Spatial_Hash is
   function Count_Active_Cells
     (Spatial_Hash : in Spatial_Hash_t) return Natural is
   begin
-    return Natural (Length (Spatial_Hash.Dynamic_Entities) +
-                    Length (Spatial_Hash.Static_Entities));
+    return Natural (Cell_Maps.Length (Spatial_Hash.Dynamic_Entities) +
+                    Cell_Maps.Length (Spatial_Hash.Static_Entities));
   end Count_Active_Cells;
 
   --
-  -- Entity_Hash
+  -- Entities_For_Cell
   --
 
-  function Entity_Hash
-    (Entity_ID : Entity_ID_Type) return Ada.Containers.Hash_Type is
+  procedure Entities_For_Cell
+    (Spatial_Hash : in     Spatial_Hash_t;
+     Cell_ID      : in     Cell_ID_t;
+     Entities     :    out Entity_Set_t)
+  is
+    Position : Cell_Maps.Cursor;
+
+    procedure Query_Cell
+      (Cell_ID : in Cell_ID_t;
+       In_Cell : in Entity_Set_t) is
+    begin
+      pragma Assert (Cell_ID = Entities_For_Cell.Cell_ID);
+
+      Entity_Sets.Union
+        (Target => Entities,
+         Source => In_Cell);
+    end Query_Cell;
   begin
-    return Ada.Containers.Hash_Type (Entity_ID);
-  end Entity_Hash;
+    Entity_Sets.Clear (Entities);
+
+    Position := Cell_Maps.Find
+      (Container => Spatial_Hash.Dynamic_Entities,
+       Key       => Cell_ID);
+    if Position /= Cell_Maps.No_Element then
+      Cell_Maps.Query_Element (Position, Query_Cell'Access);
+    end if;
+
+    Position := Cell_Maps.Find
+      (Container => Spatial_Hash.Static_Entities,
+       Key       => Cell_ID);
+    if Position /= Cell_Maps.No_Element then
+      Cell_Maps.Query_Element (Position, Query_Cell'Access);
+    end if;
+  end Entities_For_Cell;
 
   --
   -- Set_Cell_Size
