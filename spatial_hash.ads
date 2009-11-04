@@ -1,12 +1,12 @@
 with Ada.Containers.Hashed_Maps;
-with Ada.Containers.Hashed_Sets;
+with Ada.Containers.Ordered_Sets;
 
 generic
   type Real_Type is digits <>;
 
   type Entity_ID_Type is range <>;
 
-  with package Entity_Sets is new Ada.Containers.Hashed_Sets (<>);
+  with package Entity_Sets is new Ada.Containers.Ordered_Sets (<>);
 
   with procedure Bounding_Box
     (Entity : in     Entity_ID_Type;
