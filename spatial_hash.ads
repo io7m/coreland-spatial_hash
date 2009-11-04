@@ -6,10 +6,7 @@ generic
 
   type Entity_ID_Type is range <>;
 
-  with package Entity_Sets is new Ada.Containers.Hashed_Sets
-    (Element_Type        => Entity_ID_Type,
-     Hash                => <>,
-     Equivalent_Elements => <>);
+  with package Entity_Sets is new Ada.Containers.Hashed_Sets (<>);
 
   with procedure Bounding_Box
     (Entity : in     Entity_ID_Type;

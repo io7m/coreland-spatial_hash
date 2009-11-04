@@ -2,3 +2,7 @@
 -- ./spatial_hash.apk
 pragma source_file_name(Spatial_Hash, spec_file_name => "spatial_hash.ads");
 pragma source_file_name(Spatial_Hash, body_file_name => "spatial_hash.adb");
+
+-- UNIT_TESTS/test.apk
+pragma source_file_name(Test, spec_file_name => "test.ads");
+pragma source_file_name(Test, body_file_name => "test.adb");
