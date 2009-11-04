@@ -133,7 +133,7 @@ package body Spatial_Hash is
 
   procedure Set_Cell_Size
     (Spatial_Hash : in out Spatial_Hash_t;
-     Cell_Size    : in     Real_Type) is
+     Cell_Size    : in     Real_Type'Base) is
   begin
     if Count (Spatial_Hash) > 0 then
       raise Constraint_Error with "spatial hash not empty";

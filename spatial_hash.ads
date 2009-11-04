@@ -8,10 +8,10 @@ generic
 
   with procedure Bounding_Box
     (Entity : in     Entity_ID_Type;
-     Top    :    out Real_Type;
-     Bottom :    out Real_Type;
-     Left   :    out Real_Type;
-     Right  :    out Real_Type);
+     Top    :    out Real_Type'Base;
+     Bottom :    out Real_Type'Base;
+     Left   :    out Real_Type'Base;
+     Right  :    out Real_Type'Base);
 
 package Spatial_Hash is
 
@@ -85,7 +85,7 @@ package Spatial_Hash is
 
   procedure Set_Cell_Size
     (Spatial_Hash : in out Spatial_Hash_t;
-     Cell_Size    : in     Real_Type);
+     Cell_Size    : in     Real_Type'Base);
 
 private
 
