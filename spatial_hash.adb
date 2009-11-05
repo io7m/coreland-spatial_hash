@@ -18,6 +18,9 @@ package body Spatial_Hash is
     (Cell_Map  : in out Cell_Map_t;
      Entity_ID : in     Entity_ID_Type);
 
+  procedure Check_Initialized (Spatial_Hash : in Spatial_Hash_t);
+  pragma Inline (Check_Initialized);
+
   --
   -- Active_Cells
   --
@@ -39,6 +42,8 @@ package body Spatial_Hash is
       Cell_Maps.Query_Element (Position, Process_Cell'Access);
     end Process_Cursor;
   begin
+    Check_Initialized (Spatial_Hash);
+
     Cell_Sets.Clear (Cells);
     Cell_Maps.Iterate (Spatial_Hash.Dynamic_Entities, Process_Cursor'Access);
     Cell_Maps.Iterate (Spatial_Hash.Static_Entities, Process_Cursor'Access);
@@ -52,6 +57,8 @@ package body Spatial_Hash is
     (Spatial_Hash : in out Spatial_Hash_t;
      Entity_ID    : in     Entity_ID_Type) is
   begin
+    Check_Initialized (Spatial_Hash);
+
     Add_Entity
       (Cell_Map  => Spatial_Hash.Dynamic_Entities,
        Entity_ID => Entity_ID);
@@ -84,6 +91,8 @@ package body Spatial_Hash is
     (Spatial_Hash : in out Spatial_Hash_t;
      Entity_ID    : in     Entity_ID_Type) is
   begin
+    Check_Initialized (Spatial_Hash);
+
     Add_Entity
       (Cell_Map  => Spatial_Hash.Static_Entities,
        Entity_ID => Entity_ID);
@@ -101,12 +110,26 @@ package body Spatial_Hash is
   end Cell_Hash;
 
   --
+  -- Check_Initialized
+  --
+
+  procedure Check_Initialized
+    (Spatial_Hash : in Spatial_Hash_t) is
+  begin
+    if Is_Initialized (Spatial_Hash) = False then
+      raise Constraint_Error with "spatial hash not initialized";
+    end if;
+  end Check_Initialized;
+
+  --
   -- Clear
   --
 
   procedure Clear
     (Spatial_Hash : in out Spatial_Hash_t) is
   begin
+    Check_Initialized (Spatial_Hash);
+
     Cell_Maps.Clear (Spatial_Hash.Dynamic_Entities);
     Spatial_Hash.Dynamic_Count := 0;
   end Clear;
@@ -118,6 +141,8 @@ package body Spatial_Hash is
   procedure Clear_All
     (Spatial_Hash : in out Spatial_Hash_t) is
   begin
+    Check_Initialized (Spatial_Hash);
+
     Clear (Spatial_Hash);
     Cell_Maps.Clear (Spatial_Hash.Static_Entities);
     Spatial_Hash.Static_Count := 0;
@@ -130,6 +155,8 @@ package body Spatial_Hash is
   function Count
     (Spatial_Hash : in Spatial_Hash_t) return Natural is
   begin
+    Check_Initialized (Spatial_Hash);
+
     return Spatial_Hash.Dynamic_Count + Spatial_Hash.Static_Count;
   end Count;
 
@@ -140,6 +167,8 @@ package body Spatial_Hash is
   function Count_Active_Cells
     (Spatial_Hash : in Spatial_Hash_t) return Natural is
   begin
+    Check_Initialized (Spatial_Hash);
+
     return Natural (Cell_Maps.Length (Spatial_Hash.Dynamic_Entities) +
                     Cell_Maps.Length (Spatial_Hash.Static_Entities));
   end Count_Active_Cells;
@@ -166,6 +195,8 @@ package body Spatial_Hash is
          Source => In_Cell);
     end Query_Cell;
   begin
+    Check_Initialized (Spatial_Hash);
+
     Entity_Sets.Clear (Entities);
 
     Position := Cell_Maps.Find
@@ -184,18 +215,29 @@ package body Spatial_Hash is
   end Entities_For_Cell;
 
   --
-  -- Set_Cell_Size
+  -- Initialize
   --
 
-  procedure Set_Cell_Size
-    (Spatial_Hash : in out Spatial_Hash_t;
-     Cell_Size    : in     Real_Type'Base) is
+  procedure Initialize
+    (Spatial_Hash :    out Spatial_Hash_t;
+     Width        : in     Natural;
+     Height       : in     Natural;
+     Cell_Size    : in     Natural) is
   begin
-    if Count (Spatial_Hash) > 0 then
-      raise Constraint_Error with "spatial hash not empty";
-    end if;
+    Spatial_Hash.Configuration.Width      := Width;
+    Spatial_Hash.Configuration.Height     := Height;
+    Spatial_Hash.Configuration.Cell_Size  := Cell_Size;
+    Spatial_Hash.Configuration.Cells_Wide := Width / Cell_Size;
+    Spatial_Hash.Configuration.Configured := True;
+  end Initialize;
 
-    Spatial_Hash.Cell_Size := Cell_Size;
-  end Set_Cell_Size;
+  --
+  -- Is_Initialized
+  --
+
+  function Is_Initialized (Spatial_Hash : in Spatial_Hash_t) return Boolean is
+  begin
+    return Spatial_Hash.Configuration.Configured;
+  end Is_Initialized;
 
 end Spatial_Hash;

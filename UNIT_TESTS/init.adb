@@ -5,6 +5,13 @@ with Test;
 procedure Init is
   use type Ada.Containers.Count_Type;
 begin
+  Data.Spatial_Hashing.Initialize
+    (Spatial_Hash => Data.Spatial_Hash,
+     Width        => 1024,
+     Height       => 1024,
+     Cell_Size    => 128);
+
+  Test.Assert (Data.Spatial_Hashing.Is_Initialized     (Data.Spatial_Hash));
   Test.Assert (Data.Spatial_Hashing.Count_Active_Cells (Data.Spatial_Hash) = 0);
   Test.Assert (Data.Spatial_Hashing.Count              (Data.Spatial_Hash) = 0);
 

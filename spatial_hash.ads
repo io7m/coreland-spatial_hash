@@ -49,6 +49,7 @@ package Spatial_Hash is
   procedure Active_Cells
     (Spatial_Hash : in     Spatial_Hash_t;
      Cells        :    out Cell_Set_t);
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
   -- Add a dynamic entity to the spatial hash.
@@ -57,6 +58,7 @@ package Spatial_Hash is
   procedure Add_Dynamic_Entity
     (Spatial_Hash : in out Spatial_Hash_t;
      Entity_ID    : in     Entity_ID_Type);
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
   -- Add a static entity to the spatial hash.
@@ -65,6 +67,7 @@ package Spatial_Hash is
   procedure Add_Static_Entity
     (Spatial_Hash : in out Spatial_Hash_t;
      Entity_ID    : in     Entity_ID_Type);
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
   -- Clear entities from spatial hash. This will only
@@ -73,6 +76,7 @@ package Spatial_Hash is
 
   procedure Clear
     (Spatial_Hash : in out Spatial_Hash_t);
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
   -- Clear entities from spatial hash. This includes
@@ -81,6 +85,7 @@ package Spatial_Hash is
 
   procedure Clear_All
     (Spatial_Hash : in out Spatial_Hash_t);
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
   -- Return count of cells containing entities in spatial hash.
@@ -88,6 +93,7 @@ package Spatial_Hash is
 
   function Count_Active_Cells
     (Spatial_Hash : in Spatial_Hash_t) return Natural;
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
   -- Return count of entities in spatial hash.
@@ -95,6 +101,7 @@ package Spatial_Hash is
 
   function Count
     (Spatial_Hash : in Spatial_Hash_t) return Natural;
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
   -- Get entities for cell.
@@ -104,14 +111,25 @@ package Spatial_Hash is
     (Spatial_Hash : in     Spatial_Hash_t;
      Cell         : in     Cell_t;
      Entities     :    out Entity_Set_t);
+  -- pragma Precondition (Is_Initialized (Spatial_Hash));
 
   --
-  -- Set cell size.
+  -- Initialize space.
   --
 
-  procedure Set_Cell_Size
-    (Spatial_Hash : in out Spatial_Hash_t;
-     Cell_Size    : in     Real_Type'Base);
+  procedure Initialize
+    (Spatial_Hash :    out Spatial_Hash_t;
+     Width        : in     Natural;
+     Height       : in     Natural;
+     Cell_Size    : in     Natural);
+  -- pragma Postcondition (Is_Initialized (Spatial_Hash));
+
+  --
+  -- Return True if spatial hash is initialized.
+  --
+
+  function Is_Initialized (Spatial_Hash : in Spatial_Hash_t) return Boolean;
+  pragma Inline (Is_Initialized);
 
 private
 
@@ -135,12 +153,20 @@ private
 
   subtype Cell_Map_t is Cell_Maps.Map;
 
+  type Configuration_t is record
+    Width      : Natural := 0;
+    Height     : Natural := 0;
+    Cell_Size  : Natural := 0;
+    Cells_Wide : Natural := 0;
+    Configured : Boolean := False;
+  end record;
+
   type Spatial_Hash_t is record
     Dynamic_Entities : Cell_Map_t;
     Static_Entities  : Cell_Map_t;
-    Dynamic_Count    : Natural        := 0;
-    Static_Count     : Natural        := 0;
-    Cell_Size        : Real_Type'Base := Real_Type'Base'First;
+    Dynamic_Count    : Natural := 0;
+    Static_Count     : Natural := 0;
+    Configuration    : Configuration_t;
   end record;
 
 end Spatial_Hash;
