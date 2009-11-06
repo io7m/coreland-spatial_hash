@@ -41,7 +41,7 @@ package body Spatial_Hash is
         (Cell_ID  : in Cell_t;
          Entities : in Entity_Set_t) is
       begin
-        if Entity_Sets.Length (Entities) > 1 then
+        if Entity_Sets.Length (Entities) > 0 then
           Cell_Sets.Insert (Cells, Cell_ID);
         end if;
       end Process_Cell;
