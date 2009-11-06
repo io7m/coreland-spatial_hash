@@ -11,10 +11,10 @@ generic
 
   with procedure Bounding_Box
     (Entity : in     Entity_ID_Type;
-     Top    :    out Discrete_Axis_Value_Type'Base;
      Bottom :    out Discrete_Axis_Value_Type'Base;
+     Height :    out Discrete_Axis_Value_Type'Base;
      Left   :    out Discrete_Axis_Value_Type'Base;
-     Right  :    out Discrete_Axis_Value_Type'Base);
+     Width  :    out Discrete_Axis_Value_Type'Base);
 
 package Spatial_Hash is
 
@@ -118,11 +118,16 @@ package Spatial_Hash is
   -- Initialize space.
   --
 
+  subtype Axis_Value_t is Discrete_Axis_Value_Type'Base;
+  subtype Cell_Size_t  is Axis_Value_t range 1 .. Axis_Value_t'Last;
+  subtype Height_t     is Axis_Value_t range 1 .. Axis_Value_t'Last;
+  subtype Width_t      is Axis_Value_t range 1 .. Axis_Value_t'Last;
+
   procedure Initialize
     (Spatial_Hash :    out Spatial_Hash_t;
-     Width        : in     Natural;
-     Height       : in     Natural;
-     Cell_Size    : in     Natural);
+     Width        : in     Width_t;
+     Height       : in     Height_t;
+     Cell_Size    : in     Cell_Size_t);
   -- pragma Postcondition (Is_Initialized (Spatial_Hash));
 
   --
@@ -155,11 +160,11 @@ private
   subtype Cell_Map_t is Cell_Maps.Map;
 
   type Configuration_t is record
-    Width      : Natural := 0;
-    Height     : Natural := 0;
-    Cell_Size  : Natural := 0;
-    Cells_Wide : Natural := 0;
-    Configured : Boolean := False;
+    Width      : Width_t     := Width_t'First;
+    Height     : Height_t    := Height_t'First;
+    Cell_Size  : Cell_Size_t := Cell_Size_t'First;
+    Cells_Wide : Cell_t      := Cell_t'First;
+    Configured : Boolean     := False;
   end record;
 
   type Spatial_Hash_t is record
