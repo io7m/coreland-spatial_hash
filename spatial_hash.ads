@@ -2,18 +2,19 @@ with Ada.Containers.Hashed_Maps;
 with Ada.Containers.Ordered_Sets;
 
 generic
-  type Real_Type is digits <>;
+  type Discrete_Axis_Value_Type is range <>;
 
   type Entity_ID_Type is range <>;
 
-  with package Entity_Sets is new Ada.Containers.Ordered_Sets (<>);
+  with package Entity_Sets is new Ada.Containers.Ordered_Sets
+    (Element_Type => Entity_ID_Type);
 
   with procedure Bounding_Box
     (Entity : in     Entity_ID_Type;
-     Top    :    out Real_Type'Base;
-     Bottom :    out Real_Type'Base;
-     Left   :    out Real_Type'Base;
-     Right  :    out Real_Type'Base);
+     Top    :    out Discrete_Axis_Value_Type'Base;
+     Bottom :    out Discrete_Axis_Value_Type'Base;
+     Left   :    out Discrete_Axis_Value_Type'Base;
+     Right  :    out Discrete_Axis_Value_Type'Base);
 
 package Spatial_Hash is
 

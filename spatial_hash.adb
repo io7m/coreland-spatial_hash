@@ -8,18 +8,31 @@ package body Spatial_Hash is
   --
 
   type Bounding_Box_t is record
-    Left   : Real_Type'Base;
-    Right  : Real_Type'Base;
-    Top    : Real_Type'Base;
-    Bottom : Real_Type'Base;
+    Left   : Discrete_Axis_Value_Type'Base;
+    Right  : Discrete_Axis_Value_Type'Base;
+    Top    : Discrete_Axis_Value_Type'Base;
+    Bottom : Discrete_Axis_Value_Type'Base;
   end record;
 
   procedure Add_Entity
-    (Cell_Map  : in out Cell_Map_t;
-     Entity_ID : in     Entity_ID_Type);
+    (Cell_Map      : in out Cell_Map_t;
+     Entity_ID     : in     Entity_ID_Type;
+     Configuration : in     Configuration_t);
+
+  procedure Add_Entity_In_Cell_Strip
+    (Cell_Map       : in out Cell_Map_t;
+     Entity_ID      : in     Entity_ID_Type;
+     Leftmost_Cell  : in     Cell_t;
+     Rightmost_Cell : in     Cell_t);
 
   procedure Check_Initialized (Spatial_Hash : in Spatial_Hash_t);
   pragma Inline (Check_Initialized);
+
+  function Cell_For_Point
+    (X          : in Discrete_Axis_Value_Type'Base;
+     Y          : in Discrete_Axis_Value_Type'Base;
+     Cell_Size  : in Long_Integer;
+     Cells_Wide : in Long_Integer) return Cell_t;
 
   --
   -- Active_Cells
@@ -60,8 +73,9 @@ package body Spatial_Hash is
     Check_Initialized (Spatial_Hash);
 
     Add_Entity
-      (Cell_Map  => Spatial_Hash.Dynamic_Entities,
-       Entity_ID => Entity_ID);
+      (Cell_Map      => Spatial_Hash.Dynamic_Entities,
+       Entity_ID     => Entity_ID,
+       Configuration => Spatial_Hash.Configuration);
     Spatial_Hash.Dynamic_Count := Spatial_Hash.Dynamic_Count + 1;
   end Add_Dynamic_Entity;
 
@@ -70,8 +84,9 @@ package body Spatial_Hash is
   --
 
   procedure Add_Entity
-    (Cell_Map  : in out Cell_Map_t;
-     Entity_ID : in     Entity_ID_Type)
+    (Cell_Map      : in out Cell_Map_t;
+     Entity_ID     : in     Entity_ID_Type;
+     Configuration : in     Configuration_t)
   is
     Box : Bounding_Box_t;
   begin
@@ -84,6 +99,45 @@ package body Spatial_Hash is
   end Add_Entity;
 
   --
+  -- Add_Entity_In_Cell_Strip
+  --
+
+  procedure Add_Entity_In_Cell_Strip
+    (Cell_Map       : in out Cell_Map_t;
+     Entity_ID      : in     Entity_ID_Type;
+     Leftmost_Cell  : in     Cell_t;
+     Rightmost_Cell : in     Cell_t)
+  is
+    -- Insert entity into set for given cell.
+    procedure Entity_Insert
+      (Cell       : in     Cell_t;
+       Entity_Set : in out Entity_Set_t) is
+    begin
+      Entity_Sets.Insert
+        (Container => Entity_Set,
+         New_Item  => Entity_ID);
+    end Entity_Insert;
+
+    Position : Cell_Maps.Cursor;
+  begin
+    for Cell in Leftmost_Cell .. Rightmost_Cell loop
+      -- Create new entity set for cell, if necessary.
+      if Cell_Maps.Contains (Cell_Map, Cell) = False then
+        Cell_Maps.Insert
+          (Container => Cell_Map,
+           Key       => Cell,
+           New_Item  => Entity_Sets.Empty_Set);
+      end if;
+
+      -- Locate entity set for cell.
+      Position := Cell_Maps.Find (Cell_Map, Cell);
+
+      -- Update entity set with entity ID.
+      Cell_Maps.Update_Element (Cell_Map, Position, Entity_Insert'Access);
+    end loop;
+  end Add_Entity_In_Cell_Strip;
+
+  --
   -- Add_Static_Entity
   --
 
@@ -94,10 +148,27 @@ package body Spatial_Hash is
     Check_Initialized (Spatial_Hash);
 
     Add_Entity
-      (Cell_Map  => Spatial_Hash.Static_Entities,
-       Entity_ID => Entity_ID);
+      (Cell_Map      => Spatial_Hash.Static_Entities,
+       Entity_ID     => Entity_ID,
+       Configuration => Spatial_Hash.Configuration);
     Spatial_Hash.Static_Count := Spatial_Hash.Static_Count + 1;
   end Add_Static_Entity;
+
+  --
+  -- Cell_For_Point
+  --
+
+  function Cell_For_Point
+    (X          : in Discrete_Axis_Value_Type'Base;
+     Y          : in Discrete_Axis_Value_Type'Base;
+     Cell_Size  : in Long_Integer;
+     Cells_Wide : in Long_Integer) return Cell_t
+  is
+    Current_X : constant Long_Integer := Long_Integer (X / Discrete_Axis_Value_Type'Base (Cell_Size));
+    Current_Y : constant Long_Integer := Long_Integer (Y / Discrete_Axis_Value_Type'Base (Cell_Size));
+  begin
+    return Cell_t ((Current_Y * Cells_Wide) + Current_X);
+  end Cell_For_Point;
 
   --
   -- Cell_Hash
@@ -169,8 +240,9 @@ package body Spatial_Hash is
   begin
     Check_Initialized (Spatial_Hash);
 
-    return Natural (Cell_Maps.Length (Spatial_Hash.Dynamic_Entities) +
-                    Cell_Maps.Length (Spatial_Hash.Static_Entities));
+    return Natural
+      (Cell_Maps.Length (Spatial_Hash.Dynamic_Entities) +
+       Cell_Maps.Length (Spatial_Hash.Static_Entities));
   end Count_Active_Cells;
 
   --
