@@ -1,16 +1,16 @@
 package body Data is
 
   procedure Bounding_Box
-    (Entity_ID : in     Entity_ID_t;
-     Top       :    out Float;
-     Bottom    :    out Float;
-     Left      :    out Float;
-     Right     :    out Float) is
+    (Entity : in     Entity_ID_t;
+     Bottom :    out Integer;
+     Height :    out Integer;
+     Left   :    out Integer;
+     Width  :    out Integer) is
   begin
-    Top    := Float (Entity_ID);
-    Bottom := Top + 1.0;
-    Left   := Top;
-    Right  := Top + 1.0;
+    Bottom := Integer (Entity);
+    Height := 1;
+    Left   := Integer (Entity);
+    Width  := 1;
   end Bounding_Box;
 
 end Data;
