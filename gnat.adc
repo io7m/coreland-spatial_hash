@@ -7,6 +7,14 @@ pragma source_file_name(Spatial_Hash, body_file_name => "spatial_hash.adb");
 pragma source_file_name(Data, spec_file_name => "data.ads");
 pragma source_file_name(Data, body_file_name => "data.adb");
 
+-- UNIT_TESTS/getline.apk
+pragma source_file_name(getline, spec_file_name => "getline.ads");
+pragma source_file_name(getline, body_file_name => "getline.adb");
+
+-- UNIT_TESTS/mapper.apk
+pragma source_file_name(Mapper, spec_file_name => "mapper.ads");
+pragma source_file_name(Mapper, body_file_name => "mapper.adb");
+
 -- UNIT_TESTS/test.apk
 pragma source_file_name(Test, spec_file_name => "test.ads");
 pragma source_file_name(Test, body_file_name => "test.adb");

@@ -3,10 +3,17 @@
 default: all
 
 all:\
-UNIT_TESTS/data.ali UNIT_TESTS/data.o UNIT_TESTS/init UNIT_TESTS/init.ali \
-UNIT_TESTS/init.o UNIT_TESTS/t01 UNIT_TESTS/t01.ali UNIT_TESTS/t01.o \
-UNIT_TESTS/test.a UNIT_TESTS/test.ali UNIT_TESTS/test.o spatial_hash.ali \
-spatial_hash.o
+UNIT_TESTS/data.ali UNIT_TESTS/data.o UNIT_TESTS/getline.ali \
+UNIT_TESTS/getline.o UNIT_TESTS/init UNIT_TESTS/init.ali UNIT_TESTS/init.o \
+UNIT_TESTS/mapper.ali UNIT_TESTS/mapper.o UNIT_TESTS/mapper_main \
+UNIT_TESTS/mapper_main.ali UNIT_TESTS/mapper_main.o UNIT_TESTS/test.a \
+UNIT_TESTS/test.ali UNIT_TESTS/test.o spatial_hash.ali spatial_hash.o
+
+# Mkf-test
+tests:
+	(cd UNIT_TESTS && make)
+tests_clean:
+	(cd UNIT_TESTS && make clean)
 
 UNIT_TESTS/data.ads:\
 spatial_hash.ali
@@ -14,6 +21,10 @@ spatial_hash.ali
 UNIT_TESTS/data.o UNIT_TESTS/data.ali:\
 ada-compile UNIT_TESTS/data.adb UNIT_TESTS/data.ads
 	./ada-compile UNIT_TESTS/data.adb
+
+UNIT_TESTS/getline.o UNIT_TESTS/getline.ali:\
+ada-compile UNIT_TESTS/getline.adb UNIT_TESTS/getline.ads
+	./ada-compile UNIT_TESTS/getline.adb
 
 UNIT_TESTS/init:\
 ada-bind ada-link UNIT_TESTS/init.ald UNIT_TESTS/init.ali UNIT_TESTS/data.ali \
@@ -25,15 +36,20 @@ UNIT_TESTS/init.o UNIT_TESTS/init.ali:\
 ada-compile UNIT_TESTS/init.adb UNIT_TESTS/data.ali UNIT_TESTS/test.ali
 	./ada-compile UNIT_TESTS/init.adb
 
-UNIT_TESTS/t01:\
-ada-bind ada-link UNIT_TESTS/t01.ald UNIT_TESTS/t01.ali UNIT_TESTS/data.ali \
-UNIT_TESTS/test.ali spatial_hash.ali UNIT_TESTS/test.a
-	./ada-bind UNIT_TESTS/t01.ali
-	./ada-link UNIT_TESTS/t01 UNIT_TESTS/t01.ali UNIT_TESTS/test.a
+UNIT_TESTS/mapper.o UNIT_TESTS/mapper.ali:\
+ada-compile UNIT_TESTS/mapper.adb UNIT_TESTS/mapper.ads UNIT_TESTS/getline.ali \
+spatial_hash.ali
+	./ada-compile UNIT_TESTS/mapper.adb
 
-UNIT_TESTS/t01.o UNIT_TESTS/t01.ali:\
-ada-compile UNIT_TESTS/t01.adb UNIT_TESTS/data.ali UNIT_TESTS/test.ali
-	./ada-compile UNIT_TESTS/t01.adb
+UNIT_TESTS/mapper_main:\
+ada-bind ada-link UNIT_TESTS/mapper_main.ald UNIT_TESTS/mapper_main.ali \
+UNIT_TESTS/mapper.ali spatial_hash.ali
+	./ada-bind UNIT_TESTS/mapper_main.ali
+	./ada-link UNIT_TESTS/mapper_main UNIT_TESTS/mapper_main.ali
+
+UNIT_TESTS/mapper_main.o UNIT_TESTS/mapper_main.ali:\
+ada-compile UNIT_TESTS/mapper_main.adb UNIT_TESTS/mapper.ali
+	./ada-compile UNIT_TESTS/mapper_main.adb
 
 UNIT_TESTS/test.a:\
 cc-slib UNIT_TESTS/test.sld UNIT_TESTS/test.o
@@ -106,13 +122,14 @@ spatial_hash.o spatial_hash.ali:\
 ada-compile spatial_hash.adb spatial_hash.ads
 	./ada-compile spatial_hash.adb
 
-clean-all: obj_clean ext_clean
+clean-all: tests_clean obj_clean ext_clean
 clean: obj_clean
 obj_clean:
-	rm -f UNIT_TESTS/data.ali UNIT_TESTS/data.o UNIT_TESTS/init UNIT_TESTS/init.ali \
-	UNIT_TESTS/init.o UNIT_TESTS/t01 UNIT_TESTS/t01.ali UNIT_TESTS/t01.o \
-	UNIT_TESTS/test.a UNIT_TESTS/test.ali UNIT_TESTS/test.o spatial_hash.ali \
-	spatial_hash.o
+	rm -f UNIT_TESTS/data.ali UNIT_TESTS/data.o UNIT_TESTS/getline.ali \
+	UNIT_TESTS/getline.o UNIT_TESTS/init UNIT_TESTS/init.ali UNIT_TESTS/init.o \
+	UNIT_TESTS/mapper.ali UNIT_TESTS/mapper.o UNIT_TESTS/mapper_main \
+	UNIT_TESTS/mapper_main.ali UNIT_TESTS/mapper_main.o UNIT_TESTS/test.a \
+	UNIT_TESTS/test.ali UNIT_TESTS/test.o spatial_hash.ali spatial_hash.o
 ext_clean:
 	rm -f conf-adatype conf-cctype conf-ldtype conf-systype mk-ctxt
 
